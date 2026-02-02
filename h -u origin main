@@ -1,0 +1,8 @@
+[33mcommit 977594043dea87566c112bc5d19ac9b5353a2e8b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Ramoniswack <ramontiwari086@gmail.com>
+Date:   Tue Feb 3 00:58:16 2026 +0545
+
+    Initialize project (excluding node_modules)
+
+ .gitignore | 35 [32m++++++[m
+ 1 file changed, 35 insertions(+)
