@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Target, Eye, Heart, Users, Award, Globe, ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { content } from '@/data/content';
@@ -19,10 +20,12 @@ export default function AboutPage() {
       <section className="pt-32 pb-32 bg-gray-950 text-white relative overflow-hidden">
          {/* Background Image with Overlay */}
          <div className="absolute inset-0">
-            <img 
+            <Image 
                src="https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=1600&q=80" 
                alt="Volleyball court details" 
-               className="w-full h-full object-cover opacity-30 grayscale"
+               fill
+               className="object-cover opacity-30 grayscale"
+               priority
             />
             <div className="absolute inset-0 bg-gradient-to-b from-gray-950/80 via-gray-950/60 to-gray-950"></div>
             {/* Net Pattern Overlay */}
@@ -104,10 +107,11 @@ export default function AboutPage() {
             >
                {/* Main Image */}
               <div className="relative rounded-[2rem] overflow-hidden shadow-2xl aspect-[4/5] lg:aspect-square">
-                 <img 
+                 <Image 
                   src="https://images.unsplash.com/photo-1592656094267-764a45160876?w=800&q=80"
                   alt="Volleyball Action"
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent"></div>
                 
@@ -119,11 +123,12 @@ export default function AboutPage() {
               </div>
               
               {/* Secondary Image Overlay */}
-               <div className="absolute -bottom-10 -left-10 w-2/3 rounded-2xl overflow-hidden shadow-xl border-4 border-white hidden md:block">
-                  <img 
+               <div className="absolute -bottom-10 -left-10 w-2/3 rounded-2xl overflow-hidden shadow-xl border-4 border-white hidden md:block aspect-[4/3] relative">
+                  <Image 
                    src="https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=600&q=80" 
                    alt="Team huddled"
-                   className="w-full h-auto object-cover"
+                   fill
+                   className="object-cover"
                   />
                </div>
             </motion.div>
@@ -193,10 +198,11 @@ export default function AboutPage() {
              
              {/* Decorative Side Graphic */}
              <div className="relative hidden lg:block h-full min-h-[600px] bg-white rounded-3xl overflow-hidden shadow-2xl">
-                <img 
+                <Image 
                   src="https://images.unsplash.com/photo-1592656094267-764a45160876?w=800&q=80" 
                   alt="Professional Volleyball Stadium" 
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/20 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-12">

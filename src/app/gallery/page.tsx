@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { content } from '@/data/content';
@@ -55,10 +56,12 @@ export default function GalleryPage() {
       {/* Hero */}
       <section className="pt-32 pb-32 bg-gray-950 text-white relative overflow-hidden">
          <div className="absolute inset-0">
-            <img 
+            <Image 
                src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1600&q=80" 
                alt="Gallery" 
-               className="w-full h-full object-cover opacity-30 grayscale"
+               fill
+               className="object-cover opacity-30 grayscale"
+               priority
             />
             <div className="absolute inset-0 bg-gradient-to-b from-gray-950/80 via-gray-950/60 to-gray-950"></div>
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
@@ -105,10 +108,11 @@ export default function GalleryPage() {
                 onClick={() => openLightbox(index)}
                 className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-shadow"
               >
-                <img
+                 <Image
                   src={image.src}
                   alt={image.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -158,11 +162,15 @@ export default function GalleryPage() {
           </button>
 
           <div className="max-w-5xl max-h-[80vh] px-4">
-            <img
+           <div className="aspect-[4/3] relative w-full h-full"> {/* Aspect ratio help for Image */}
+            <Image
               src={filteredImages[currentIndex]?.src}
               alt={filteredImages[currentIndex]?.title}
-              className="max-w-full max-h-[80vh] object-contain"
+              fill
+              className="object-contain"
+              unoptimized={true} 
             />
+          </div>
             <div className="text-center mt-4 text-white">
               <p className="text-lg font-medium">{filteredImages[currentIndex]?.title}</p>
               <p className="text-white/70">{currentIndex + 1} / {filteredImages.length}</p>

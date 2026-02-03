@@ -297,12 +297,6 @@ export const content = {
              { title: 'Excellence', desc: 'Always striving for the best' },
              { title: 'Culture', desc: 'Preservation of Nepali identity' }
         ],
-        values: [
-             { title: 'Unity', desc: 'Community unity and harmony' },
-             { title: 'Inclusivity', desc: 'Open to everyone' },
-             { title: 'Excellence', desc: 'Always striving for the best' },
-             { title: 'Culture', desc: 'Preservation of Nepali identity' }
-        ],
         objectivesTitle: 'Our Objectives',
         sinceText: 'Since 2020 • Hamburg',
         introTitlePart1: 'More Than Just',

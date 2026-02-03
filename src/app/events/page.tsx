@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Calendar, MapPin, Clock, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -26,10 +27,12 @@ export default function EventsPage() {
       {/* Hero */}
       <section className="pt-32 pb-32 bg-gray-950 text-white relative overflow-hidden">
          <div className="absolute inset-0">
-            <img 
+            <Image 
                src="https://images.unsplash.com/photo-1547347298-4074fc3086f0?w=1600&q=80" 
                alt="Volleyball Event" 
-               className="w-full h-full object-cover opacity-30 grayscale"
+               fill
+               className="object-cover opacity-30 grayscale"
+               priority
             />
             <div className="absolute inset-0 bg-gradient-to-b from-gray-950/80 via-gray-950/60 to-gray-950"></div>
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
@@ -61,10 +64,11 @@ export default function EventsPage() {
               <div key={idx} className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col md:flex-row group h-full"> 
                 {/* Image Section: Fixed aspect ratio on mobile, flex-basis on desktop with stretch */}
                 <div className="md:w-2/5 relative h-64 md:h-auto min-h-[16rem]">
-                  <img 
+                  <Image 
                     src={upcomingImages[idx % upcomingImages.length]}
                     alt={event.title}
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-primary-600 px-4 py-2 rounded-lg font-bold shadow-sm">
                     {event.date.split(',')[0]}
@@ -120,10 +124,11 @@ export default function EventsPage() {
             {t.past.map((event, idx) => (
               <div key={idx} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden group h-full flex flex-col">
                 <div className="aspect-video overflow-hidden relative flex-shrink-0">
-                  <img 
+                  <Image 
                     src={pastImages[idx % pastImages.length]}
                     alt={event.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100"
                   />
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
                 </div>

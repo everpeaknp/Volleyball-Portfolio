@@ -1,6 +1,7 @@
 'use client';
 
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Trophy, Users, Calendar, ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -91,11 +92,14 @@ export default function Home() {
             <div className="relative">
               <div className="absolute -top-4 -left-4 w-24 h-24 bg-primary-100 rounded-full z-0"></div>
               <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-secondary-100 rounded-full z-0"></div>
-              <img 
-                src="https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=800&q=80" 
-                alt="Volleyball Team" 
-                className="rounded-2xl shadow-2xl relative z-10 w-full object-cover aspect-[4/3] hover:scale-[1.02] transition-transform duration-500"
-              />
+              <div className="relative z-10 w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl hover:scale-[1.02] transition-transform duration-500">
+                <Image 
+                  src="https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=800&q=80" 
+                  alt="Volleyball Team" 
+                  fill
+                  className="object-cover"
+                />
+              </div>
             </div>
             <div>
               <span className="text-primary-600 font-bold uppercase tracking-wider text-sm mb-2 block">
@@ -150,7 +154,7 @@ export default function Home() {
                       <div className="group h-full bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-[0_5px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_15px_30px_rgb(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 flex flex-col">
                          {/* Card Image */}
                          <div className="relative h-64 overflow-hidden bg-gray-100">
-                            <img 
+                            <Image 
                                src={[
                                   'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=800&q=80',
                                   'https://images.unsplash.com/photo-1592656094267-764a45160876?w=800&q=80',
@@ -159,11 +163,12 @@ export default function Home() {
                                   'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80'
                                ][idx % 5]}
                                alt={`Objective ${idx + 1}`}
-                               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                               fill
+                               className="object-cover transition-transform duration-700 group-hover:scale-110"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-gray-900/20 to-transparent"></div>
                             
-                            <div className="absolute top-4 left-4 w-10 h-10 bg-white/90 backdrop-blur rounded-lg flex items-center justify-center font-bold text-primary-600 shadow-sm">
+                            <div className="absolute top-4 left-4 w-10 h-10 bg-white/90 backdrop-blur rounded-lg flex items-center justify-center font-bold text-primary-600 shadow-sm z-10">
                                0{idx + 1}
                             </div>
                          </div>

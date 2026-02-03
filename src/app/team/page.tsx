@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { content } from '@/data/content';
 
@@ -27,10 +28,12 @@ export default function TeamPage() {
       {/* Hero */}
       <section className="pt-32 pb-32 bg-gray-950 text-white relative overflow-hidden">
          <div className="absolute inset-0">
-            <img 
+            <Image 
                src="https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=1600&q=80" 
                alt="Team Hero" 
-               className="w-full h-full object-cover opacity-30 grayscale"
+               fill
+               className="object-cover opacity-30 grayscale"
+               priority
             />
             <div className="absolute inset-0 bg-gradient-to-b from-gray-950/80 via-gray-950/60 to-gray-950"></div>
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
@@ -57,11 +60,12 @@ export default function TeamPage() {
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {t.coaches.map((coach, idx) => (
               <div key={idx} className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col sm:flex-row group">
-                <div className="sm:w-48 h-48 sm:h-auto overflow-hidden flex-shrink-0">
-                  <img 
+                 <div className="relative sm:w-48 h-48 sm:h-auto overflow-hidden flex-shrink-0">
+                  <Image 
                     src={coachImages[idx % coachImages.length]}
                     alt={coach.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="p-6 flex flex-col justify-center">
@@ -86,11 +90,12 @@ export default function TeamPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {t.players.map((player, idx) => (
               <div key={idx} className="card card-hover group overflow-hidden">
-                <div className="relative aspect-[3/4] overflow-hidden">
-                  <img 
+                 <div className="relative aspect-[3/4] overflow-hidden">
+                  <Image 
                     src={playerImages[idx % playerImages.length]}
                     alt={player.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
                   <div className="absolute top-4 right-4 w-14 h-14 bg-primary-500 rounded-full flex items-center justify-center">
@@ -118,11 +123,12 @@ export default function TeamPage() {
               {language === 'NE' ? '२०२६ को आधिकारिक टोली फोटो' : language === 'DE' ? 'Offizielles Teamfoto 2026' : 'Official Team Photo 2026'}
             </p>
           </div>
-          <div className="rounded-2xl overflow-hidden shadow-2xl">
-            <img 
+           <div className="rounded-2xl overflow-hidden shadow-2xl relative aspect-video">
+            <Image 
               src="https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=1200&q=80"
               alt="Team photo"
-              className="w-full"
+              fill
+              className="object-cover"
             />
           </div>
         </div>

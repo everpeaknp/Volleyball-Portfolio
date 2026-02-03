@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { Facebook, Instagram, Youtube, MapPin, Phone, Mail } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -19,11 +20,12 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-               <div className="w-12 h-12 flex-shrink-0 bg-white/5 rounded-full p-2 flex items-center justify-center">
-                 <img 
+               <div className="w-12 h-12 flex-shrink-0 bg-white/5 rounded-full p-2 flex items-center justify-center relative">
+                 <Image 
                    src="/Volleyball-PNG-Photo.webp" 
                    alt="NVC Logo" 
-                   className="w-full h-full object-contain"
+                   fill
+                   className="p-2 object-contain"
                  />
                </div>
               <div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
@@ -40,10 +41,12 @@ export default function Navbar() {
           <div className="flex items-center flex-shrink-0">
             <Link href="/" className="flex items-center gap-3 group">
               <div className="relative w-12 h-12 md:w-14 md:h-14 group-hover:scale-105 transition-transform duration-300">
-                 <img 
+                 <Image 
                    src="/Volleyball-PNG-Photo.webp" 
                    alt="NVC Logo" 
-                   className="w-full h-full object-contain drop-shadow-md"
+                   fill
+                   className="object-contain drop-shadow-md"
+                   priority
                  />
               </div>
               <div className="flex flex-col">

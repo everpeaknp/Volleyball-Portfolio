@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Calendar, ArrowRight, User } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -31,10 +32,12 @@ export default function NewsPage() {
       {/* Hero */}
       <section className="pt-32 pb-32 bg-gray-950 text-white relative overflow-hidden">
          <div className="absolute inset-0">
-            <img 
+            <Image 
                src="https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=1600&q=80" 
                alt="Latest News" 
-               className="w-full h-full object-cover opacity-30 grayscale"
+               fill
+               className="object-cover opacity-30 grayscale"
+               priority
             />
             <div className="absolute inset-0 bg-gradient-to-b from-gray-950/80 via-gray-950/60 to-gray-950"></div>
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
@@ -56,11 +59,12 @@ export default function NewsPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="card card-hover overflow-hidden">
               <div className="grid lg:grid-cols-2">
-                <div className="aspect-[4/3] lg:aspect-auto overflow-hidden">
-                  <img 
+                 <div className="aspect-[4/3] lg:aspect-auto overflow-hidden relative min-h-[300px]">
+                  <Image 
                     src={featuredNews.image}
                     alt={featuredNews.title}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 </div>
                 <div className="p-8 lg:p-12 flex flex-col justify-center">
@@ -94,11 +98,12 @@ export default function NewsPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {regularNews.map((article, idx) => (
               <div key={idx} className="card card-hover group">
-                <div className="aspect-video overflow-hidden">
-                  <img 
+                 <div className="aspect-video overflow-hidden relative">
+                  <Image 
                     src={article.image}
                     alt={article.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="p-6">
