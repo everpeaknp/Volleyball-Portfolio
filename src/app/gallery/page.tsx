@@ -1,79 +1,109 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { content } from '@/data/content';
-
-const galleryImageUrls = [
-  'https://images.unsplash.com/photo-1547347298-4074fc3086f0?w=800&q=80',
-  'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=800&q=80',
-  'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
-  'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&q=80',
-  'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&q=80',
-  'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80',
-  'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&q=80',
-  'https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=800&q=80',
-  'https://images.unsplash.com/photo-1530915534664-4ac6423816b7?w=800&q=80',
-  'https://images.unsplash.com/photo-1598550473107-a9d0e4c3e67b?w=800&q=80',
-  'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80',
-  'https://images.unsplash.com/photo-1526232761682-d26e03ac148e?w=800&q=80',
-];
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
+import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { content } from '@/data/content'
+import { getGalleryPage } from '@/lib/api'
+import { mapGalleryPageData } from '@/lib/mappers'
 
 export default function GalleryPage() {
-  const { language } = useLanguage();
-  const t = content[language].galleryPage;
-  
-  const [activeCategory, setActiveCategory] = useState(t.categories[0]); // Default to 'All' (first item)
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const { language } = useLanguage()
+  const [data, setData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
-  // Merge images with translation data
-  const galleryImages = t.images.map((img, idx) => ({
-      ...img,
-      src: galleryImageUrls[idx % galleryImageUrls.length]
-  }));
+  const [activeCategory, setActiveCategory] = useState('All')
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const apiData = await getGalleryPage()
+
+        if (apiData) {
+          const mapped = mapGalleryPageData(apiData, language)
+          setData(mapped)
+          if (mapped.categories && mapped.categories.length > 0) {
+            setActiveCategory(mapped.categories[0])
+          }
+        } else {
+          setData(content[language].galleryPage)
+        }
+      } catch (error) {
+        console.error('Error loading gallery data:', error)
+        setData(content[language].galleryPage)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadData()
+  }, [language])
+
+  const t = data || content[language].galleryPage
 
   // Helper to check category match safely
-  const filteredImages = activeCategory === t.categories[0] // 'All'
-    ? galleryImages 
-    : galleryImages.filter(img => img.category === activeCategory);
+  const filteredImages =
+    activeCategory === (t.categories?.[0] || 'All')
+      ? t.images
+      : t.images.filter((img: any) => img.category === activeCategory)
 
   const openLightbox = (index: number) => {
-    setCurrentIndex(index);
-    setLightboxOpen(true);
-  };
+    setCurrentIndex(index)
+    setLightboxOpen(true)
+  }
 
-  const closeLightbox = () => setLightboxOpen(false);
+  const closeLightbox = () => setLightboxOpen(false)
 
-  const goNext = () => setCurrentIndex((prev) => (prev + 1) % filteredImages.length);
-  const goPrev = () => setCurrentIndex((prev) => (prev - 1 + filteredImages.length) % filteredImages.length);
+  const goNext = () => setCurrentIndex((prev) => (prev + 1) % filteredImages.length)
+  const goPrev = () =>
+    setCurrentIndex((prev) => (prev - 1 + filteredImages.length) % filteredImages.length)
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-xl font-light tracking-widest uppercase">Loading Gallery...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>
       {/* Hero */}
-      {/* Hero */}
       <section className="pt-32 pb-32 bg-gray-950 text-white relative overflow-hidden">
-         <div className="absolute inset-0">
-            <Image 
-               src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1600&q=80" 
-               alt="Gallery" 
-               fill
-               className="object-cover opacity-30 grayscale"
-               priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-950/80 via-gray-950/60 to-gray-950"></div>
-            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-         </div>
-         
+        <div className="absolute inset-0">
+          <Image
+            src={
+              t.heroImage ||
+              'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1600&q=80'
+            }
+            alt="Gallery"
+            fill
+            className="object-cover opacity-30 grayscale"
+            priority
+            unoptimized
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-950/80 via-gray-950/60 to-gray-950"></div>
+          <div
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)',
+              backgroundSize: '20px 20px',
+            }}
+          ></div>
+        </div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight text-white drop-shadow-lg animate-fade-in">
-              {t.heroTitle}
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto leading-relaxed font-light animate-slide-up">
-              {t.heroText}
-            </p>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight text-white drop-shadow-lg animate-fade-in">
+            {t.heroTitle}
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto leading-relaxed font-light animate-slide-up">
+            {t.heroText}
+          </p>
         </div>
       </section>
 
@@ -81,7 +111,7 @@ export default function GalleryPage() {
       <section className="py-8 bg-white border-b sticky top-20 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-3 justify-center">
-            {t.categories.map((category) => (
+            {t.categories?.map((category: string) => (
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
@@ -102,17 +132,18 @@ export default function GalleryPage() {
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredImages.map((image, index) => (
+            {filteredImages.map((image: any, index: number) => (
               <div
                 key={index}
                 onClick={() => openLightbox(index)}
                 className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-shadow"
               >
-                 <Image
-                  src={image.src}
+                <Image
+                  src={image.image || image.src}
                   alt={image.title}
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-500"
+                  unoptimized
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -162,22 +193,24 @@ export default function GalleryPage() {
           </button>
 
           <div className="max-w-5xl max-h-[80vh] px-4">
-           <div className="aspect-[4/3] relative w-full h-full"> {/* Aspect ratio help for Image */}
-            <Image
-              src={filteredImages[currentIndex]?.src}
-              alt={filteredImages[currentIndex]?.title}
-              fill
-              className="object-contain"
-              unoptimized={true} 
-            />
-          </div>
+            <div className="aspect-[4/3] relative w-full h-full min-w-[300px] md:min-w-[600px] lg:min-w-[800px]">
+              <Image
+                src={filteredImages[currentIndex]?.image || filteredImages[currentIndex]?.src}
+                alt={filteredImages[currentIndex]?.title}
+                fill
+                className="object-contain"
+                unoptimized={true}
+              />
+            </div>
             <div className="text-center mt-4 text-white">
               <p className="text-lg font-medium">{filteredImages[currentIndex]?.title}</p>
-              <p className="text-white/70">{currentIndex + 1} / {filteredImages.length}</p>
+              <p className="text-white/70">
+                {currentIndex + 1} / {filteredImages.length}
+              </p>
             </div>
           </div>
         </div>
       )}
     </>
-  );
+  )
 }

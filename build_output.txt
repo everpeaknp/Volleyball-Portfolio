@@ -1,0 +1,24 @@
+
+> nepal-volleyball-club@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.35
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/home/ram0niswack/RootProjects/Volleyball_frontend/.next/cache/webpack/client-production/0.pack_' -> '/home/ram0niswack/RootProjects/Volleyball_frontend/.next/cache/webpack/client-production/0.pack'
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./src/app/page.tsx:50:30
+Type error: Property 'video' does not exist on type '{ title: string; subtitle: string; cta_join: string; cta_learn: string; motto: string; } | { title: string; subtitle: string; cta_join: string; cta_learn: string; motto: string; } | { title: string; subtitle: string; cta_join: string; cta_learn: string; motto: string; }'.
+  Property 'video' does not exist on type '{ title: string; subtitle: string; cta_join: string; cta_learn: string; motto: string; }'.
+
+[0m [90m 48 |[39m[0m
+[0m [90m 49 |[39m   [90m// Video source - dynamic from CMS with fallback[39m[0m
+[0m[31m[1m>[22m[39m[90m 50 |[39m   [36mconst[39m videoSource [33m=[39m t[33m.[39mhero[33m.[39mvideo[33m;[39m[0m
+[0m [90m    |[39m                              [31m[1m^[22m[39m[0m
+[0m [90m 51 |[39m[0m
+[0m [90m 52 |[39m   [36mreturn[39m ([0m
+[0m [90m 53 |[39m     [33m<[39m[33mdiv[39m className[33m=[39m[32m"flex flex-col min-h-screen"[39m[33m>[39m[0m
+Next.js build worker exited with code: 1 and signal: null
