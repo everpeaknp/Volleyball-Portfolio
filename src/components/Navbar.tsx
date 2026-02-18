@@ -1,60 +1,25 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
-import { useLanguage } from '@/contexts/LanguageContext'
-import { content } from '@/data/content'
-import { getNavigationItems, getNavigationSettings } from '@/lib/api'
 import { mapNavigationData } from '@/lib/mappers'
 
-export default function Navbar() {
+type Language = 'NE' | 'EN' | 'DE'
+
+interface NavbarProps {
+  language: Language;
+  navData?: any;
+}
+
+export default function Navbar({ language, navData: passedNavData }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const { language, setLanguage } = useLanguage()
   const pathname = usePathname()
-  const [navData, setNavData] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    async function loadNavigation() {
-      try {
-        const [navItems, navSettings] = await Promise.all([
-          getNavigationItems(),
-          getNavigationSettings(),
-        ])
-
-        const dynamicNavData = mapNavigationData(navItems || [], navSettings, language)
-        setNavData(dynamicNavData)
-      } catch (error) {
-        console.error('Failed to load navigation:', error)
-        // Fallback to static content
-        setNavData(mapNavigationData([], null, language))
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadNavigation()
-  }, [language])
-
-  if (loading || !navData) {
-    return (
-      <nav className="bg-white/95 backdrop-blur-md shadow-sm fixed w-full z-50 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-20">
-            <div className="flex items-center flex-shrink-0">
-              <div className="animate-pulse bg-gray-200 rounded w-32 h-8"></div>
-            </div>
-            <div className="flex items-center gap-6">
-              <div className="animate-pulse bg-gray-200 rounded w-20 h-8"></div>
-            </div>
-          </div>
-        </div>
-      </nav>
-    )
-  }
-
+  
+  // Use passed navData or fallback to static content
+  const navData = passedNavData || mapNavigationData([], null, language)
   const navItems = navData.items
   const brand = navData.brand
 
@@ -71,7 +36,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20">
           <div className="flex items-center flex-shrink-0">
-            <Link href="/" className="flex items-center gap-3 group">
+            <Link href={`/${language.toLowerCase()}`} className="flex items-center gap-3 group">
               <div className="relative w-12 h-12 md:w-14 md:h-14 group-hover:scale-105 transition-transform duration-300">
                 <Image
                   src={brand.logo}
@@ -80,7 +45,6 @@ export default function Navbar() {
                   sizes="(max-width: 768px) 48px, 56px"
                   className="object-contain drop-shadow-md"
                   priority
-                  unoptimized={brand.logo && brand.logo.includes('localhost')}
                   onError={(e) => {
                     console.error('Logo failed to load:', brand.logo)
                   }}
@@ -96,17 +60,21 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden xl:flex items-center gap-1">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href
+          <div className="hidden md:flex items-center gap-1">
+            {navItems.map((item: any) => {
+              const currentPath = pathname.replace(/^\/(ne|en|de)/, '') || '/';
+              const isActive = 
+                (item.path === '/' && currentPath === '/') ||
+                (item.path !== '/' && currentPath.startsWith(item.path));
+
               return (
                 <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`px-2 py-2 text-sm transition-all duration-200 whitespace-nowrap ${
+                  key={item.path}
+                  href={`/${language.toLowerCase()}${item.path === '/' ? '' : item.path}`}
+                  className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${
                     isActive
-                      ? 'text-primary-600 font-bold'
-                      : 'text-gray-600 font-medium hover:text-primary-600'
+                      ? 'text-red-600 bg-red-50 shadow-sm'
+                      : 'text-gray-700 hover:text-red-600 hover:bg-red-50/50'
                   }`}
                 >
                   {item.label}
@@ -114,85 +82,41 @@ export default function Navbar() {
               )
             })}
 
-            {/* Language Selection (Flags) */}
+            {/* Language Selection */}
             <div className="flex items-center gap-3 ml-4 border-l pl-4 border-gray-200">
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => setLanguage(lang.code)}
-                  className={`relative transition-all duration-300 ${
-                    language === lang.code
-                      ? 'opacity-100 scale-125 drop-shadow-md grayscale-0'
-                      : 'opacity-50 hover:opacity-100 scale-100 hover:scale-110 grayscale'
-                  }`}
-                  title={lang.label}
-                >
-                  <span className="text-xl leading-none block">{lang.flag}</span>
-                  {language === lang.code && (
-                    <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary-500 rounded-full"></span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Tablet/Laptop Navigation (Simplified if XL is too wide, but LG might work) */}
-          {/* For now, sticking to standard breakpoint logic. Lg might be tight for German. Switching 'hidden lg:flex' to 'hidden xl:flex' might be safer if we want to avoid wrap, OR just reducing text size. */}
-          {/* Let's try lg:flex but with very small horizontal padding. */}
-          <div className="hidden lg:flex xl:hidden items-center gap-0.5">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  // Smaller text for this range
-                  className={`px-1.5 py-2 text-[13px] transition-all duration-200 whitespace-nowrap ${
-                    isActive
-                      ? 'text-primary-600 font-bold'
-                      : 'text-gray-600 font-medium hover:text-primary-600'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              )
-            })}
-            <div className="flex items-center gap-2 ml-2 border-l pl-2 border-gray-200">
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => setLanguage(lang.code)}
-                  className={`relative transition-all duration-300 ${
-                    language === lang.code
-                      ? 'opacity-100 scale-125 grayscale-0'
-                      : 'opacity-50 hover:opacity-100 scale-100 grayscale'
-                  }`}
-                >
-                  <span className="text-lg leading-none block">{lang.flag}</span>
-                </button>
-              ))}
+              {languages.map((lang) => {
+                const langCode = lang.code.toLowerCase();
+                const currentPath = pathname.replace(/^\/(ne|en|de)/, '') || '/';
+                const href = currentPath === '/' ? `/${langCode}` : `/${langCode}${currentPath}`;
+                
+                return (
+                  <Link
+                    key={lang.code}
+                    href={href}
+                    className={`relative transition-all duration-300 ${
+                      language === lang.code
+                        ? 'opacity-100 scale-125 drop-shadow-md grayscale-0'
+                        : 'opacity-50 hover:opacity-100 scale-100 hover:scale-110 grayscale'
+                    }`}
+                    title={lang.label}
+                  >
+                    <span className="text-2xl">{lang.flag}</span>
+                    {language === lang.code && (
+                      <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-red-500 rounded-full"></div>
+                    )}
+                  </Link>
+                )
+              })}
             </div>
           </div>
 
           {/* Mobile menu button */}
-          <div className="flex items-center gap-4 lg:hidden">
-            {/* Mobile Language Toggle */}
-            <button
-              onClick={() => {
-                const nextLang = language === 'NE' ? 'EN' : language === 'EN' ? 'DE' : 'NE'
-                setLanguage(nextLang)
-              }}
-              className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-full"
-            >
-              <span className="text-lg leading-none">{currentLang?.flag}</span>
-              <span className="text-sm font-bold text-gray-700">{currentLang?.code}</span>
-            </button>
-
+          <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary-600 hover:bg-gray-100 focus:outline-none transition-colors"
+              className="inline-flex items-center justify-center p-2 rounded-lg text-gray-700 hover:text-red-600 hover:bg-red-50 transition-colors"
             >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
@@ -200,27 +124,57 @@ export default function Navbar() {
 
       {/* Mobile Navigation */}
       {isOpen && (
-        <div className="lg:hidden bg-white border-t border-gray-100 animate-slide-up h-screen overflow-y-auto pb-40">
-          {' '}
-          {/* h-screen to handle many items */}
+        <div className="md:hidden bg-white/98 backdrop-blur-md border-t border-gray-100 shadow-lg">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href
+            {navItems.map((item: any) => {
+              const currentPath = pathname.replace(/^\/(ne|en|de)/, '') || '/';
+              const isActive = 
+                (item.path === '/' && currentPath === '/') ||
+                (item.path !== '/' && currentPath.startsWith(item.path));
+
               return (
                 <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`block px-3 py-3 rounded-md text-base font-medium transition-colors border-b border-gray-50 ${
+                  key={item.path}
+                  href={`/${language.toLowerCase()}${item.path === '/' ? '' : item.path}`}
+                  className={`block px-4 py-3 text-base font-semibold rounded-lg transition-all duration-300 ${
                     isActive
-                      ? 'text-primary-600 bg-primary-50'
-                      : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                      ? 'text-red-600 bg-red-50 shadow-sm'
+                      : 'text-gray-700 hover:text-red-600 hover:bg-red-50/50'
                   }`}
+                  onClick={() => setIsOpen(false)}
                 >
                   {item.label}
                 </Link>
               )
             })}
+          </div>
+
+          {/* Mobile Language Selection */}
+          <div className="border-t border-gray-100 px-4 py-3">
+            <div className="flex items-center justify-center gap-6">
+              {languages.map((lang) => {
+                const langCode = lang.code.toLowerCase();
+                const currentPath = pathname.replace(/^\/(ne|en|de)/, '') || '/';
+                const href = currentPath === '/' ? `/${langCode}` : `/${langCode}${currentPath}`;
+                
+                return (
+                  <Link
+                    key={lang.code}
+                    href={href}
+                    className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-300 ${
+                      language === lang.code
+                        ? 'opacity-100 bg-red-50 scale-110'
+                        : 'opacity-70 hover:opacity-100 hover:bg-gray-50'
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                    title={lang.label}
+                  >
+                    <span className="text-2xl">{lang.flag}</span>
+                    <span className="text-xs font-medium text-gray-600">{lang.code}</span>
+                  </Link>
+                )
+              })}
+            </div>
           </div>
         </div>
       )}

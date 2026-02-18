@@ -3,53 +3,18 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Facebook, Instagram, Youtube, MapPin, Phone, Mail } from 'lucide-react'
-import { useLanguage } from '@/contexts/LanguageContext'
-import { content } from '@/data/content'
-import { useEffect, useState } from 'react'
-import { getFooterSettings } from '@/lib/api'
 import { mapFooterData } from '@/lib/mappers'
 
-export default function Footer() {
-  const { language } = useLanguage()
-  const [footerData, setFooterData] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+type Language = 'NE' | 'EN' | 'DE'
 
-  useEffect(() => {
-    async function loadFooterData() {
-      try {
-        const footerSettings = await getFooterSettings()
+interface FooterProps {
+  language: Language;
+  footerData?: any;
+}
 
-        const dynamicFooterData = mapFooterData(footerSettings, language)
-
-        setFooterData(dynamicFooterData)
-      } catch (error) {
-        console.error('Failed to load footer data:', error)
-        // Fallback to static content
-        setFooterData(mapFooterData(null, language))
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadFooterData()
-  }, [language])
-
-  if (loading || !footerData) {
-    return (
-      <footer className="bg-gray-900 text-white border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-          <div className="animate-pulse grid md:grid-cols-2 lg:grid-cols-4 gap-12">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="space-y-4">
-                <div className="bg-gray-700 rounded h-6 w-32"></div>
-                <div className="bg-gray-700 rounded h-4 w-48"></div>
-                <div className="bg-gray-700 rounded h-4 w-40"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </footer>
-    )
-  }
+export default function Footer({ language, footerData: passedFooterData }: FooterProps) {
+  // Use passed footerData or fallback to static content
+  const footerData = passedFooterData || mapFooterData(null, language)
 
   return (
     <footer className="bg-gray-900 text-white border-t border-gray-800">
@@ -105,17 +70,22 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3">
               {footerData.quickLinks?.length > 0 ? (
-                footerData.quickLinks.map((link: any, idx: number) => (
-                  <li key={idx}>
-                    <Link
-                      href={link.href}
-                      className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
-                    >
-                      <span className="w-1.5 h-1.5 bg-gray-600 rounded-full"></span>
-                      {link.label}
-                    </Link>
-                  </li>
-                ))
+                footerData.quickLinks.map((link: any, idx: number) => {
+                  const langCode = language.toLowerCase();
+                  const href = link.href === '/' ? `/${langCode}` : `/${langCode}${link.href}`;
+                  
+                  return (
+                    <li key={idx}>
+                      <Link
+                        href={href}
+                        className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
+                      >
+                        <span className="w-1.5 h-1.5 bg-gray-600 rounded-full"></span>
+                        {link.label}
+                      </Link>
+                    </li>
+                  )
+                })
               ) : (
                 <li className="text-gray-500 text-sm italic">
                   {language === 'NE'

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { LanguageProvider } from "@/contexts/LanguageContext";
 
 export const metadata: Metadata = {
   title: "नेपाल भलिबल क्लब हामबर्ग e.V. | Nepal Volleyball Club Hamburg",
@@ -18,13 +17,9 @@ export default function RootLayout({
   return (
     <html lang="ne">
       <body className="antialiased">
-        <LanguageProvider>
-          <Navbar />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-        </LanguageProvider>
+        <main className="min-h-screen">
+          {children}
+        </main>
       </body>
     </html>
   );
