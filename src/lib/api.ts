@@ -73,6 +73,10 @@ export async function getNoticePage() {
   return fetchAPI<any>('/content/notice/')
 }
 
+export function getSponsorshipPage() {
+  return fetchAPI<any>('/content/sponsorship/')
+}
+
 export async function getGlobalStyles() {
   return fetchAPI<any>('/core/global-styles/')
 }

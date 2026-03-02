@@ -109,7 +109,6 @@ export default function CommitteePage() {
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                     unoptimized
                   />
-                  <div className="absolute inset-0 bg-primary-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
 
                 <h3 className="text-2xl font-bold text-gray-900 mb-1">{member.name}</h3>
@@ -133,38 +132,46 @@ export default function CommitteePage() {
         </div>
       </section>
 
-      {/* General Members */}
-      <section className="py-20 bg-gray-50 border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">{t.memberSectionTitle}</h2>
-          </div>
+      {/* Dynamic Committee Groups */}
+      {(t.groups as any[])?.map((group: any, gIdx: number) => (
+        <section key={gIdx} className={`py-20 ${gIdx % 2 === 0 ? 'bg-gray-50' : 'bg-white'} border-t border-gray-200`}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900">{group.title}</h2>
+            </div>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {t.members.map((member, idx) => (
-              <div
-                key={idx}
-                className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow flex items-center gap-4"
-              >
-                <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-                  <Image
-                    src={member.image}
-                    alt={member.name}
-                    width={48}
-                    height={48}
-                    className="object-cover w-full h-full"
-                    unoptimized
-                  />
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {group.members.map((member: any, mIdx: number) => (
+                <div
+                  key={mIdx}
+                  className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow flex items-center gap-4 border border-gray-100"
+                >
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                    {member.image ? (
+                      <Image
+                        src={member.image}
+                        alt={member.name}
+                        width={48}
+                        height={48}
+                        className="object-cover w-full h-full"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold">
+                        {member.name.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-900">{member.name}</h4>
+                    <p className="text-sm text-gray-500">{t.roles.member}</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-bold text-gray-900">{member.name}</h4>
-                  <p className="text-sm text-gray-500">{t.roles.member}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ))}
     </>
   )
 }

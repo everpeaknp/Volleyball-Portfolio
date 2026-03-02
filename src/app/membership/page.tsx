@@ -21,10 +21,12 @@ export default function MembershipPage() {
     address: '',
     dob: '',
     gender: '',
+    category: '',
     experience: '',
     position: '',
     reason: '',
   })
+  const [bankVoucher, setBankVoucher] = useState<File | null>(null)
   const [submitted, setSubmitted] = useState(false)
 
   useEffect(() => {
@@ -49,22 +51,30 @@ export default function MembershipPage() {
     setLoading(true)
 
     try {
+      const body = new FormData()
+      body.append('full_name', formData.fullName)
+      body.append('email', formData.email)
+      body.append('phone', formData.phone)
+      body.append('address', formData.address)
+      body.append('date_of_birth', formData.dob)
+      body.append('gender', formData.gender.toLowerCase())
+      body.append('category', formData.category.toLowerCase() === 'committee' || formData.category.toLowerCase() === 'समिति' || formData.category.toLowerCase() === 'ausschuss' ? 'committee' : 'player')
+      
+      if (formData.category.toLowerCase() === 'player' || formData.category.toLowerCase() === 'खेलाडी' || formData.category.toLowerCase() === 'spieler') {
+        body.append('experience', formData.experience.toLowerCase())
+        body.append('position', formData.position.toLowerCase().replace(/\s+/g, '_'))
+      }
+      
+      if (bankVoucher) {
+        body.append('bank_voucher', bankVoucher)
+      }
+      
+      body.append('reason', formData.reason)
+
       const response = await fetch('http://localhost:8000/api/v1/membership/apply/', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          full_name: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          address: formData.address,
-          date_of_birth: formData.dob,
-          gender: formData.gender.toLowerCase(),
-          experience: formData.experience.toLowerCase(),
-          position: formData.position.toLowerCase().replace(/\s+/g, '_'),
-          reason: formData.reason,
-        }),
+        // FormData sets correct Content-Type with boundary automatically
+        body: body,
       })
 
       const data = await response.json()
@@ -78,10 +88,12 @@ export default function MembershipPage() {
           address: '',
           dob: '',
           gender: '',
+          category: '',
           experience: '',
           position: '',
           reason: '',
         })
+        setBankVoucher(null)
       } else {
         console.error('API Error:', { status: response.status, data })
         alert(data.message || `Error submitting form (${response.status}). Please try again.`)
@@ -238,7 +250,7 @@ export default function MembershipPage() {
                     value={formData.gender}
                     onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                   >
-                    {t.options.gender.map((opt, i) => (
+                    {t.options.gender.map((opt: string, i: number) => (
                       <option key={i} value={opt}>
                         {opt}
                       </option>
@@ -246,14 +258,15 @@ export default function MembershipPage() {
                   </select>
                 </div>
 
-                <div>
-                  <label className="input-label">{t.labels.experience}</label>
+                <div className="md:col-span-2">
+                  <label className="input-label">{t.labels.category} *</label>
                   <select
+                    required
                     className="input-field"
-                    value={formData.experience}
-                    onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   >
-                    {t.options.experience.map((opt, i) => (
+                    {t.options.category.map((opt: string, i: number) => (
                       <option key={i} value={opt}>
                         {opt}
                       </option>
@@ -261,20 +274,57 @@ export default function MembershipPage() {
                   </select>
                 </div>
 
-                <div>
-                  <label className="input-label">{t.labels.position}</label>
-                  <select
-                    className="input-field"
-                    value={formData.position}
-                    onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                  >
-                    {t.options.position.map((opt, i) => (
-                      <option key={i} value={opt}>
-                        {opt}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {(formData.category.toLowerCase() === 'player' || 
+                  formData.category.toLowerCase() === 'खेलाडी' || 
+                  formData.category.toLowerCase() === 'spieler') && (
+                  <>
+                    <div>
+                      <label className="input-label">{t.labels.experience}</label>
+                      <select
+                        className="input-field"
+                        value={formData.experience}
+                        onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+                      >
+                        {t.options.experience.map((opt: string, i: number) => (
+                          <option key={i} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="input-label">{t.labels.position}</label>
+                      <select
+                        className="input-field"
+                        value={formData.position}
+                        onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                      >
+                        {t.options.position.map((opt: string, i: number) => (
+                          <option key={i} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </>
+                )}
+
+                {(formData.category.toLowerCase() === 'committee' || 
+                  formData.category.toLowerCase() === 'समिति' || 
+                  formData.category.toLowerCase() === 'ausschuss') && (
+                  <div className="md:col-span-2">
+                    <label className="input-label">{t.labels.voucher} *</label>
+                    <input
+                      type="file"
+                      required
+                      accept="image/*"
+                      className="input-field"
+                      onChange={(e) => setBankVoucher(e.target.files?.[0] || null)}
+                    />
+                    <p className="mt-1 text-sm text-gray-500">Please upload a photo of your bank transfer voucher.</p>
+                  </div>
+                )}
 
                 <div className="md:col-span-2">
                   <label className="input-label">{t.labels.reason}</label>

@@ -125,9 +125,11 @@ export function mapNavigationData(navItems: any[], navSettings: any, language: L
             { href: '/team', label: staticContent.nav.team },
             { href: '/membership', label: staticContent.nav.membership },
             { href: '/events', label: staticContent.nav.events },
+            { href: '/notice', label: staticContent.nav.notice },
             { href: '/news', label: staticContent.nav.news },
             { href: '/gallery', label: staticContent.nav.gallery },
             { href: '/contact', label: staticContent.nav.contact },
+            { href: '/sponsorship', label: staticContent.nav.sponsorship },
           ],
     brand: navSettings
       ? {
@@ -379,26 +381,22 @@ export function mapMembershipPageData(apiData: any, language: Language) {
       position: getLoc(pageData.form_settings, 'label_position') || staticContent.labels.position,
       reason: getLoc(pageData.form_settings, 'label_reason') || staticContent.labels.reason,
       submit: getLoc(pageData.form_settings, 'label_submit') || staticContent.labels.submit,
+      category: getLoc(pageData.form_settings, 'label_category') || staticContent.labels.category,
+      voucher: getLoc(pageData.form_settings, 'label_voucher') || staticContent.labels.voucher,
     },
-
     options: {
-      gender:
-        [
-          '',
-          ...(getLoc(pageData.form_settings, 'options_gender') || '').split(', ').filter(Boolean),
-        ] || staticContent.options.gender,
-      experience:
-        [
-          '',
-          ...(getLoc(pageData.form_settings, 'options_experience') || '')
-            .split(', ')
-            .filter(Boolean),
-        ] || staticContent.options.experience,
-      position:
-        [
-          '',
-          ...(getLoc(pageData.form_settings, 'options_position') || '').split(', ').filter(Boolean),
-        ] || staticContent.options.position,
+      gender: getLoc(pageData.form_settings, 'options_gender')
+        ? ['', ...getLoc(pageData.form_settings, 'options_gender').split(', ').filter(Boolean)]
+        : staticContent.options.gender,
+      experience: getLoc(pageData.form_settings, 'options_experience')
+        ? ['', ...getLoc(pageData.form_settings, 'options_experience').split(', ').filter(Boolean)]
+        : staticContent.options.experience,
+      position: getLoc(pageData.form_settings, 'options_position')
+        ? ['', ...getLoc(pageData.form_settings, 'options_position').split(', ').filter(Boolean)]
+        : staticContent.options.position,
+      category: getLoc(pageData.form_settings, 'options_category')
+        ? ['', ...getLoc(pageData.form_settings, 'options_category').split(', ').filter(Boolean)]
+        : staticContent.options.category,
     },
   }
 }
@@ -666,7 +664,14 @@ export function mapCommitteePageData(apiData: any, language: Language) {
   const suffix = language.toLowerCase() as 'ne' | 'en' | 'de'
   const getLoc = (obj: any, fieldPrefix: string) => {
     if (!obj) return ''
-    return obj[`${fieldPrefix}_${suffix}`] || ''
+    return (
+      obj[`${fieldPrefix}_${suffix}`] ||
+      obj[`${fieldPrefix}_en`] ||
+      obj[`${fieldPrefix}_ne`] ||
+      obj[`${fieldPrefix}_de`] ||
+      obj[fieldPrefix] ||
+      ''
+    )
   }
 
   // Handle API response - it comes as an array
@@ -681,40 +686,49 @@ export function mapCommitteePageData(apiData: any, language: Language) {
 
     // Executive Board
     president: {
-      name: results.board?.pres_name || staticContent.president.name,
+      name: getLoc(results.board, 'pres_name') || results.board?.pres_name || staticContent.president.name,
       role: getLoc(results.board, 'pres_role') || staticContent.president.role,
       desc: getLoc(results.board, 'pres_desc') || staticContent.president.desc,
       email: results.board?.pres_email || staticContent.president.email,
       image: results.board?.pres_image || staticContent.president.image,
     },
     secretary: {
-      name: results.board?.sec_name || staticContent.secretary.name,
+      name: getLoc(results.board, 'sec_name') || results.board?.sec_name || staticContent.secretary.name,
       role: getLoc(results.board, 'sec_role') || staticContent.secretary.role,
       desc: getLoc(results.board, 'sec_desc') || staticContent.secretary.desc,
       email: results.board?.sec_email || staticContent.secretary.email,
       image: results.board?.sec_image || staticContent.secretary.image,
     },
     treasurer: {
-      name: results.board?.tres_name || staticContent.treasurer.name,
+      name: getLoc(results.board, 'tres_name') || results.board?.tres_name || staticContent.treasurer.name,
       role: getLoc(results.board, 'tres_role') || staticContent.treasurer.role,
       desc: getLoc(results.board, 'tres_desc') || staticContent.treasurer.desc,
       email: results.board?.tres_email || staticContent.treasurer.email,
       image: results.board?.tres_image || staticContent.treasurer.image,
     },
 
-    // General members
-    members:
-      results.members
-        ?.map((member: any) => ({
-          name: member.name,
-          image: member.image,
-          order: member.order,
+    // Dynamic groups
+    groups:
+      results.groups
+        ?.map((group: any) => ({
+          title: getLoc(group, 'title'),
+          members:
+            group.members
+              ?.map((member: any) => ({
+                name: getLoc(member, 'name'),
+                image: member.image,
+                order: member.order,
+              }))
+              .sort((a: any, b: any) => (a.order || 0) - (b.order || 0)) || [],
         }))
-        .sort((a: any, b: any) => (a.order || 0) - (b.order || 0)) || staticContent.members,
+        .sort((a: any, b: any) => (a.order || 0) - (b.order || 0)) || [],
 
     // Section titles
     memberSectionTitle:
       getLoc(results.section_settings, 'member_section_title') || staticContent.memberSectionTitle,
+    generalMemberSectionTitle:
+      getLoc(results.section_settings, 'general_member_section_title') ||
+      staticContent.generalMemberSectionTitle,
   }
 }
 
@@ -824,5 +838,61 @@ export function mapNoticePageData(apiData: any, language: Language) {
           order: notice.order,
         }))
         .sort((a: any, b: any) => (a.order || 0) - (b.order || 0)) || staticContent.notices,
+  }
+}
+export function mapSponsorshipPageData(apiData: any, language: Language) {
+  const staticContent = content[language].sponsorshipPage
+  if (!apiData) return staticContent
+
+  // Handle array response from DRF ViewSet
+  const pageData = Array.isArray(apiData) ? apiData[0] : apiData
+  if (!pageData) return staticContent
+
+  const suffix = language.toLowerCase() as 'ne' | 'en' | 'de'
+  const getLoc = (obj: any, fieldPrefix: string) => {
+    if (!obj) return ''
+    return obj[`${fieldPrefix}_${suffix}`] || ''
+  }
+
+  return {
+    ...staticContent,
+    heroTitle: getLoc(pageData.hero, 'title') || staticContent.heroTitle,
+    heroText: getLoc(pageData.hero, 'text') || staticContent.heroText,
+    heroImage: pageData.hero?.image_url || pageData.hero?.image || staticContent.heroImage,
+
+    sponsors: (pageData.sponsors || [])
+      .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+      .map((sponsor: any) => {
+        let logo = sponsor.logo || ''
+        if (logo && logo.startsWith('/')) {
+          logo = `http://localhost:8000${logo}`
+        }
+        return {
+          name: getLoc(sponsor, 'name') || sponsor.name_en || '',
+          logo: logo,
+          link: sponsor.link || '#',
+        }
+      }),
+
+    formTitle: getLoc(pageData.form_settings, 'title') || staticContent.formTitle,
+    formText: getLoc(pageData.form_settings, 'text') || staticContent.formText,
+    successTitle: getLoc(pageData.form_settings, 'success_title') || staticContent.successTitle,
+    successText: getLoc(pageData.form_settings, 'success_text') || staticContent.successText,
+
+    labels: {
+      name: getLoc(pageData.form_settings, 'label_name') || staticContent.labels.name,
+      email: getLoc(pageData.form_settings, 'label_email') || staticContent.labels.email,
+      phone: getLoc(pageData.form_settings, 'label_phone') || staticContent.labels.phone,
+      type: getLoc(pageData.form_settings, 'label_type') || staticContent.labels.type,
+      amount: getLoc(pageData.form_settings, 'label_amount') || staticContent.labels.amount,
+      voucher: getLoc(pageData.form_settings, 'label_voucher') || staticContent.labels.voucher,
+      message: getLoc(pageData.form_settings, 'label_message') || staticContent.labels.message,
+      submit: getLoc(pageData.form_settings, 'label_submit') || staticContent.labels.submit,
+    },
+    options: {
+      type: getLoc(pageData.form_settings, 'options_type')
+        ? ['', ...getLoc(pageData.form_settings, 'options_type').split(', ').filter(Boolean)]
+        : staticContent.options.type,
+    },
   }
 }

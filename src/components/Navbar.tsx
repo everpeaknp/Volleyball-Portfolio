@@ -72,7 +72,7 @@ export default function Navbar() {
         <div className="flex justify-between h-20">
           <div className="flex items-center flex-shrink-0">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="relative w-12 h-12 md:w-14 md:h-14 group-hover:scale-105 transition-transform duration-300">
+              <div className="relative w-10 h-10 md:w-12 md:h-12 group-hover:scale-105 transition-transform duration-300">
                 <Image
                   src={brand.logo}
                   alt="NVC Logo"
@@ -97,13 +97,13 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden xl:flex items-center gap-1">
-            {navItems.map((item) => {
+            {navItems.map((item: { href: string; label: string }) => {
               const isActive = pathname === item.href
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-2 py-2 text-sm transition-all duration-200 whitespace-nowrap ${
+                  className={`px-2 py-2 text-[13px] tracking-tight transition-all duration-200 whitespace-nowrap ${
                     isActive
                       ? 'text-primary-600 font-bold'
                       : 'text-gray-600 font-medium hover:text-primary-600'
@@ -140,14 +140,14 @@ export default function Navbar() {
           {/* For now, sticking to standard breakpoint logic. Lg might be tight for German. Switching 'hidden lg:flex' to 'hidden xl:flex' might be safer if we want to avoid wrap, OR just reducing text size. */}
           {/* Let's try lg:flex but with very small horizontal padding. */}
           <div className="hidden lg:flex xl:hidden items-center gap-0.5">
-            {navItems.map((item) => {
+            {navItems.map((item: { href: string; label: string }) => {
               const isActive = pathname === item.href
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   // Smaller text for this range
-                  className={`px-1.5 py-2 text-[13px] transition-all duration-200 whitespace-nowrap ${
+                  className={`px-1 py-2 text-[12px] tracking-tighter transition-all duration-200 whitespace-nowrap ${
                     isActive
                       ? 'text-primary-600 font-bold'
                       : 'text-gray-600 font-medium hover:text-primary-600'
@@ -204,7 +204,7 @@ export default function Navbar() {
           {' '}
           {/* h-screen to handle many items */}
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {navItems.map((item) => {
+            {navItems.map((item: { href: string; label: string }) => {
               const isActive = pathname === item.href
               return (
                 <Link
