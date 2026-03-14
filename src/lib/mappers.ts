@@ -1,10 +1,30 @@
-import { HomePageData } from '@/types/api'
 import { content } from '@/data/content'
 
 type Language = 'NE' | 'EN' | 'DE'
 
-export function mapHomePageData(apiData: any, language: Language) {
-  const staticContent = content[language]
+type BaseContent = (typeof content)['NE']
+
+export type HomePageContent = BaseContent & {
+  hero: BaseContent['hero'] & {
+    video?: string
+    image?: string
+  }
+  motto?: {
+    text: string
+    button_label: string
+  }
+}
+
+export type AboutPageContent = BaseContent['aboutPage'] & {
+  objectives?: BaseContent['objectives']
+}
+
+export type NoticePageContent = BaseContent['noticePage'] & {
+  ctaIcon?: string
+}
+
+export function mapHomePageData(apiData: any, language: Language): HomePageContent {
+  const staticContent = content[language] as HomePageContent
   if (!apiData) return staticContent
 
   // Handle array response from DRF ViewSet
@@ -113,11 +133,16 @@ export function mapNavigationData(navItems: any[], navSettings: any, language: L
         ? navItems
             .filter((item) => item.is_active)
             .sort((a, b) => a.order - b.order)
-            .map((item) => ({
-              href: item.href,
-              label:
-                getLoc(item, 'label') || staticContent.nav[item.href.replace('/', '') || 'home'],
-            }))
+            .map((item) => {
+              // Normalize href to one of the known nav keys when possible.
+              // Unknown keys fall back to "home" to keep the navbar resilient.
+              const rawKey = item.href.replace('/', '') || 'home'
+              const navKey = (rawKey in staticContent.nav ? rawKey : 'home') as keyof typeof staticContent.nav
+              return {
+                href: item.href,
+                label: getLoc(item, 'label') || staticContent.nav[navKey],
+              }
+            })
         : [
             { href: '/', label: staticContent.nav.home },
             { href: '/about', label: staticContent.nav.about },
@@ -251,8 +276,8 @@ export function mapFooterData(footerSettings: any, language: Language) {
   }
 }
 
-export function mapAboutPageData(apiData: any, language: Language) {
-  const staticContent = content[language].aboutPage
+export function mapAboutPageData(apiData: any, language: Language): AboutPageContent {
+  const staticContent = content[language].aboutPage as AboutPageContent
   if (!apiData || (Array.isArray(apiData) && apiData.length === 0)) return staticContent
 
   const suffix = language.toLowerCase() as 'ne' | 'en' | 'de'
@@ -802,8 +827,8 @@ export function mapTeamPageData(apiData: any, language: Language) {
   }
 }
 
-export function mapNoticePageData(apiData: any, language: Language) {
-  const staticContent = content[language].noticePage
+export function mapNoticePageData(apiData: any, language: Language): NoticePageContent {
+  const staticContent = content[language].noticePage as NoticePageContent
   if (!apiData) return staticContent
 
   // Handle array response

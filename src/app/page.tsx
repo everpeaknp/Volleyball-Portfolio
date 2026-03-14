@@ -9,7 +9,7 @@ import { motion } from 'framer-motion'
 import AnimatedCounter from '@/components/AnimatedCounter'
 import { useEffect, useState } from 'react'
 import { getHomePage } from '@/lib/api'
-import { mapHomePageData } from '@/lib/mappers'
+import { mapHomePageData, type HomePageContent } from '@/lib/mappers'
 
 // Swiper
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -20,7 +20,7 @@ import 'swiper/css/autoplay'
 
 export default function Home() {
   const { language } = useLanguage()
-  const [t, setT] = useState(content[language])
+  const [t, setT] = useState<HomePageContent>(content[language] as HomePageContent)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -33,11 +33,11 @@ export default function Home() {
           setT(dynamicContent)
         } else {
           // Fallback to static
-          setT(content[language])
+          setT(content[language] as HomePageContent)
         }
       } catch (e) {
         console.error('Failed to load home page data', e)
-        setT(content[language])
+        setT(content[language] as HomePageContent)
       } finally {
         setLoading(false)
       }
@@ -46,7 +46,7 @@ export default function Home() {
   }, [language])
 
   // Video source - dynamic from CMS with fallback
-  const videoSource = t.hero.video
+  const videoSource = t.hero.video ?? '/hero_video.mp4'
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -124,7 +124,7 @@ export default function Home() {
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
-                  unoptimized={t.intro.image && t.intro.image.includes('localhost')}
+                  unoptimized={Boolean(t.intro.image?.includes('localhost'))}
                 />
               </div>
             </div>

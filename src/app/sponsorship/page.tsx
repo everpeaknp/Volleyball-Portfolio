@@ -122,7 +122,7 @@ export default function SponsorshipPage() {
             fill
             className="object-cover opacity-30 grayscale"
             priority
-            unoptimized={t.heroImage && t.heroImage.includes('localhost')}
+            unoptimized={Boolean(t.heroImage?.includes('localhost'))}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-gray-950/80 via-gray-950/60 to-gray-950"></div>
           <div

@@ -7,11 +7,11 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { content } from '@/data/content'
 import { motion } from 'framer-motion'
 import { getAboutPage } from '@/lib/api'
-import { mapAboutPageData } from '@/lib/mappers'
+import { mapAboutPageData, type AboutPageContent } from '@/lib/mappers'
 
 export default function AboutPage() {
   const { language } = useLanguage()
-  const [t, setT] = useState(content[language].aboutPage)
+  const [t, setT] = useState<AboutPageContent>(content[language].aboutPage as AboutPageContent)
   const [common, setCommon] = useState(content[language])
   const [loading, setLoading] = useState(true)
 
@@ -28,7 +28,7 @@ export default function AboutPage() {
           // Update objectives in common data
           setCommon({
             ...content[language],
-            objectives: dynamicContent.objectives,
+            objectives: dynamicContent.objectives ?? content[language].objectives,
           })
         }
       } catch (e) {

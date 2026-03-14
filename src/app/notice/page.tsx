@@ -15,7 +15,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext'
 import { content } from '@/data/content'
 import { getNoticePage } from '@/lib/api'
-import { mapNoticePageData } from '@/lib/mappers'
+import { mapNoticePageData, type NoticePageContent } from '@/lib/mappers'
 
 // Icon mapping for dynamic icons
 const iconMap: { [key: string]: any } = {
@@ -32,7 +32,9 @@ const iconMap: { [key: string]: any } = {
 
 export default function NoticePage() {
   const { language } = useLanguage()
-  const [pageData, setPageData] = useState(content[language].noticePage)
+  const [pageData, setPageData] = useState<NoticePageContent>(
+    content[language].noticePage as NoticePageContent
+  )
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -118,7 +120,7 @@ export default function NoticePage() {
           <a href="/contact" className="btn-secondary inline-flex items-center gap-2">
             {pageData.ctaBtn}{' '}
             {(() => {
-              const CTAIcon = iconMap[pageData.ctaIcon] || ChevronRight
+              const CTAIcon = iconMap[pageData.ctaIcon ?? 'ChevronRight'] || ChevronRight
               return <CTAIcon className="w-4 h-4" />
             })()}
           </a>
